@@ -308,7 +308,7 @@
 
         /* 图片翻译模式选择模态框 */
         .translate-mode-modal {
-            display: none;
+            display: flex;
             position: fixed;
             z-index: 10000;
             left: 0;
@@ -318,11 +318,14 @@
             background-color: rgba(0, 0, 0, 0.5);
             align-items: center;
             justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
         }
 
         .translate-mode-modal.show {
-            display: flex;
-            animation: fadeIn 0.3s;
+            opacity: 1;
+            visibility: visible;
         }
 
         .translate-mode-content {
