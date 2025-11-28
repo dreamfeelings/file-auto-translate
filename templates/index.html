@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件翻译 - 实时在线翻译</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>文件翻译</h1>
+            <p class="subtitle">上传文档，实时翻译，轻松对照</p>
+        </header>
+
+        <div class="controls">
+            <!-- 选项区域 -->
+            <div class="options-bar">
+                <div class="option-group">
+                    <div class="option-label">AI模型</div>
+                    <select id="aiModel">
+                        {% for model_key, model_info in ai_models.items() %}
+                        <option value="{{ model_key }}" {% if model_key == 'gpt-4o' %}selected{% endif %}>
+                            {% if model_key == 'gpt-4o' %}🤖 {{ model_info.name }}
+                            {% elif model_key == 'gpt-3.5' %}⚡ {{ model_info.name }}
+                            {% elif model_key == 'kimi' %}🌙 {{ model_info.name }}
+                            {% elif model_key == 'qwen' %}☁️ {{ model_info.name }}
+                            {% elif model_key == 'zhipu' %}🧠 {{ model_info.name }}
+                            {% elif model_key == 'deepseek' %}🔍 {{ model_info.name }}
+                            {% else %}{{ model_info.name }}
+                            {% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="option-group">
+                    <div class="option-label">目标语言</div>
+                    <select id="targetLang">
+                        <option value="zh-CN" selected>🇨🇳 中文（简体）</option>
+                        {% for code, name in languages.items() %}
+                            {% if code != 'zh-CN' %}
+                            <option value="{{ code }}">
+                                {% if code == 'zh-TW' %}🇹🇼 {{ name }}
+                                {% elif code == 'en' %}🇺🇸 {{ name }}
+                                {% elif code == 'ja' %}🇯🇵 {{ name }}
+                                {% elif code == 'ko' %}🇰🇷 {{ name }}
+                                {% elif code == 'fr' %}🇫🇷 {{ name }}
+                                {% elif code == 'de' %}🇩🇪 {{ name }}
+                                {% elif code == 'es' %}🇪🇸 {{ name }}
+                                {% elif code == 'ru' %}🇷🇺 {{ name }}
+                                {% elif code == 'ar' %}🇸🇦 {{ name }}
+                                {% elif code == 'pt' %}🇵🇹 {{ name }}
+                                {% elif code == 'it' %}🇮🇹 {{ name }}
+                                {% else %}{{ name }}
+                                {% endif %}
+                            </option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- 上传区域 -->
+            <div class="upload-section">
+                <input type="file" id="fileInput" class="file-input" accept=".pdf,.docx,.doc,.png,.jpg,.jpeg,.gif,.bmp,.webp" multiple>
+                <div class="drop-zone" id="dropZone">
+                    <div class="drop-zone-icon">📁</div>
+                    <div class="drop-zone-text">拖拽文件到这里或点击选择</div>
+                    <div class="drop-zone-hint">支持 PDF、Word、图片格式（图片支持多选）</div>
+                    
+                    <!-- 文件名显示在按钮上方 -->
+                    <div class="drop-zone-file-name" id="selectedFileName"></div>
+                    
+                    <!-- 图片预览区域 -->
+                    <div class="image-preview-container" id="imagePreviewContainer"></div>
+                    
+                    <!-- 翻译按钮 -->
+                    <button class="translate-btn-integrated" id="translateBtn" disabled onclick="event.stopPropagation(); translateContent();">
+                        上传文件并翻译
+                    </button>
+                </div>
+                <div class="upload-hint">
+                    点击上方区域或拖拽文件到此
+                </div>
+            </div>
+        </div>
+
+        <div id="statusMessage"></div>
+
+        <div class="content-area">
+            <div class="panel">
+                <div class="panel-header">原文</div>
+                <div id="originalContent">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📄</div>
+                        <p>请上传文件以查看内容</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <span>译文</span>
+                    <div class="export-actions" id="exportActions" style="display: none;">
+                        <button class="export-btn" onclick="exportTranslation('txt')">
+                            <span>📄</span>
+                            <span>导出译文TXT</span>
+                        </button>
+                        <button class="export-btn" onclick="exportTranslation('docx')">
+                            <span>📝</span>
+                            <span>导出译文Word</span>
+                        </button>
+                        <button class="export-btn" onclick="exportTranslation('txt', true)">
+                            <span>📑</span>
+                            <span>导出双译TXT</span>
+                        </button>
+                        <button class="export-btn" onclick="exportTranslation('docx', true)">
+                            <span>📋</span>
+                            <span>导出双译Word</span>
+                        </button>
+                    </div>
+                </div>
+                <div id="translatedContent">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🌐</div>
+                        <p>翻译结果将显示在这里</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 图片放大预览模态框 -->
+    <div class="image-modal" id="imageModal" onclick="closeImageModal()">
+        <span class="modal-close">&times;</span>
+        <img class="modal-content" id="modalImage">
+        <div class="modal-caption" id="modalCaption"></div>
+    </div>
+
+    <!-- 图片翻译模式选择模态框 -->
+    <div class="translate-mode-modal" id="translateModeModal">
+        <div class="translate-mode-content" onclick="event.stopPropagation()">
+            <h3>选择图片翻译模式</h3>
+            <div class="mode-options">
+                <div class="mode-option" onclick="selectTranslateMode('segment')">
+                    <div class="mode-icon">📝</div>
+                    <div class="mode-title">分段识别翻译</div>
+                    <div class="mode-desc">先识别文字，再分段翻译（更准确）</div>
+                </div>
+                <div class="mode-option" onclick="selectTranslateMode('whole')">
+                    <div class="mode-icon">🖼️</div>
+                    <div class="mode-title">整图翻译</div>
+                    <div class="mode-desc">直接发送图片给AI翻译（保留排版）</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
