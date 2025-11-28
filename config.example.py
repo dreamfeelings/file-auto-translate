@@ -1,5 +1,5 @@
 # API配置示例（请复制为config.py并填入真实的API密钥）
-API_BASE_URL = "https://api.ephone.ai"  # 或你的API地址
+API_BASE_URL = "https://api.openai.com"  # OpenAI官方API地址
 API_KEY = "your-api-key-here"  # 替换为你的真实API密钥
 MODEL = "gpt-4o"
 
@@ -7,37 +7,37 @@ MODEL = "gpt-4o"
 AI_MODELS = {
     'gpt-4o': {
         'name': 'GPT-4O',
-        'base_url': 'https://api.ephone.ai',
+        'base_url': 'https://api.openai.com',
         'model': 'gpt-4o',
         'description': 'OpenAI GPT-4O (最强大)'
     },
     'gpt-3.5': {
         'name': 'GPT-3.5 Turbo',
-        'base_url': 'https://api.ephone.ai',
+        'base_url': 'https://api.openai.com',
         'model': 'gpt-3.5-turbo',
         'description': 'OpenAI GPT-3.5 (快速)'
     },
     'kimi': {
         'name': 'Kimi (月之暗面)',
-        'base_url': 'https://api.ephone.ai',
+        'base_url': 'https://api.moonshot.cn',
         'model': 'moonshot-v1-8k',
         'description': 'Moonshot Kimi (长文本)'
     },
     'qwen': {
         'name': 'Qwen (通义千问)',
-        'base_url': 'https://api.ephone.ai',
+        'base_url': 'https://dashscope.aliyuncs.com/compatible-mode/v1',
         'model': 'qwen-max',
         'description': '阿里通义千问 (中文优化)'
     },
     'zhipu': {
         'name': 'GLM-4 (智谱)',
-        'base_url': 'https://api.ephone.ai',
+        'base_url': 'https://open.bigmodel.cn/api/paas/v4',
         'model': 'glm-4',
         'description': '智谱清言 (中文理解)'
     },
     'deepseek': {
         'name': 'DeepSeek',
-        'base_url': 'https://api.ephone.ai',
+        'base_url': 'https://api.deepseek.com',
         'model': 'deepseek-chat',
         'description': 'DeepSeek (高性价比)'
     }

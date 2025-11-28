@@ -144,8 +144,8 @@ MIT License
 
 ## 👤 作者
 
-**阿尼亚** - [GitHub](https://github.com/dreamfeelings)
+**阿尼亚与她** - [GitHub](https://github.com/dreamfeelings)
 
 ---
 
-Made with ❤️ by 阿尼亚 | **享受翻译吧！** 🎉
+Made with ❤️ by 阿尼亚与她 | **享受翻译吧！** 🎉
