@@ -142,6 +142,10 @@ MIT License
 
 欢迎提交 Issue 和 Pull Request！
 
+## 👤 作者
+
+**阿尼亚** - [GitHub](https://github.com/dreamfeelings)
+
 ---
 
-**享受翻译吧！** 🎉
+Made with ❤️ by 阿尼亚 | **享受翻译吧！** 🎉
