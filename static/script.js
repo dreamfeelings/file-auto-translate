@@ -523,6 +523,12 @@
                 document.getElementById('imagePreviewContainer').innerHTML = '';
                 document.getElementById('selectedFileName').textContent = '';
                 
+                // 清空文件输入框
+                const fileInput = document.getElementById('fileInput');
+                if (fileInput) {
+                    fileInput.value = '';
+                }
+                
                 // 翻译完成，禁用按钮并提示
                 translateBtn.disabled = true;
                 translateBtn.textContent = '翻译完成';
@@ -600,6 +606,14 @@
                     
                     document.getElementById('exportActions').style.display = 'flex';
                     showStatus('翻译完成！您可以导出结果。', 'success');
+                    
+                    // 清空文件输入框和图片预览
+                    const fileInput = document.getElementById('fileInput');
+                    if (fileInput) {
+                        fileInput.value = '';
+                    }
+                    document.getElementById('imagePreviewContainer').innerHTML = '';
+                    document.getElementById('selectedFileName').textContent = '';
                 } else {
                     showStatus('翻译失败: ' + data.error, 'error');
                 }
