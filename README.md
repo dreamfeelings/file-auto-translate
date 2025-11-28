@@ -32,7 +32,7 @@ pip install -r requirements.txt
 在 `config.py` 中配置你的 API 信息（已预配置）：
 
 ```python
-API_BASE_URL = "https://api.ephone.ai"
+API_BASE_URL = "https://api.openai.com"
 API_KEY = "your-api-key"
 MODEL = "gpt-4o"
 ```
