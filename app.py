@@ -178,6 +178,40 @@ def translate_single():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/translate_image', methods=['POST'])
+def translate_image():
+    """整图翻译（直接发送图片给AI翻译）"""
+    try:
+        data = request.get_json()
+        
+        if not data or 'image_base64' not in data:
+            return jsonify({'error': '缺少图片数据'}), 400
+        
+        image_base64 = data['image_base64']
+        target_lang = data.get('target_lang', 'zh-CN')
+        ai_model = data.get('ai_model', 'gpt-4o')
+        
+        # 获取模型配置
+        model_config = config.AI_MODELS.get(ai_model, config.AI_MODELS['gpt-4o'])
+        
+        # 执行整图翻译
+        translation = translator.translate_image(
+            image_base64,
+            target_lang,
+            model_config=model_config
+        )
+        
+        return jsonify({
+            'success': True,
+            'translation': translation
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 @app.route('/export', methods=['POST'])
 def export_translation():
     """导出翻译结果（仅译文）"""

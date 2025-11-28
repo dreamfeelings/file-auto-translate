@@ -278,3 +278,84 @@ class Translator:
                     results[idx] = result_item
         
         return results
+    
+    def translate_image(self, image_base64: str, target_lang: str = 'zh-CN', model_config: dict = None) -> str:
+        """
+        整图翻译（直接发送图片给AI进行翻译）
+        
+        Args:
+            image_base64: 图片的base64编码（不含data:image前缀）
+            target_lang: 目标语言代码
+            model_config: 模型配置
+        
+        Returns:
+            翻译后的文本
+        """
+        try:
+            # 使用传入的模型配置，或使用默认配置
+            if model_config is None:
+                api_base = self.api_base_url
+                model = self.model
+            else:
+                api_base = model_config.get('base_url', self.api_base_url)
+                model = model_config.get('model', self.model)
+            
+            lang_name = config.LANGUAGES.get(target_lang, '中文')
+            
+            # 构建翻译提示（支持视觉模型）
+            prompt = f"""请识别图片中的所有文字内容，并将其翻译成{lang_name}。
+
+翻译要求：
+1. 识别图片中的所有文字（包括标题、正文、标注等）
+2. 保持原文的排版结构和段落顺序
+3. 保留专业术语、变量名、技术名词
+4. 只返回翻译结果，不要添加解释
+5. 如果图片中有多段文字，请按顺序翻译并保持段落分隔
+
+请开始翻译："""
+            
+            # 调用API（支持vision模型）
+            headers = {
+                'Authorization': f'Bearer {self.api_key}',
+                'Content-Type': 'application/json'
+            }
+            
+            payload = {
+                'model': model,
+                'messages': [
+                    {
+                        'role': 'user',
+                        'content': [
+                            {
+                                'type': 'text',
+                                'text': prompt
+                            },
+                            {
+                                'type': 'image_url',
+                                'image_url': {
+                                    'url': f'data:image/jpeg;base64,{image_base64}'
+                                }
+                            }
+                        ]
+                    }
+                ],
+                'temperature': 0.3,
+                'max_tokens': 2000
+            }
+            
+            response = requests.post(
+                f'{api_base}/v1/chat/completions',
+                headers=headers,
+                json=payload,
+                timeout=60  # 图片处理可能需要更长时间
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                translation = result['choices'][0]['message']['content'].strip()
+                return translation
+            else:
+                raise Exception(f"API请求失败: {response.status_code} - {response.text}")
+                
+        except Exception as e:
+            raise Exception(f"整图翻译错误: {str(e)}")
