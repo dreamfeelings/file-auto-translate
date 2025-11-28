@@ -518,12 +518,17 @@
                 document.getElementById('exportActions').style.display = 'flex';
                 showStatus(`成功翻译 ${imageUrls.length} 张图片！`, 'success');
                 
-                // 清空待处理文件，但不清除图片预览容器
+                // 清空待处理文件和图片预览
                 pendingFiles = null;
+                document.getElementById('imagePreviewContainer').innerHTML = '';
+                document.getElementById('selectedFileName').textContent = '';
+                
+                // 翻译完成，禁用按钮并提示
+                translateBtn.disabled = true;
+                translateBtn.textContent = '翻译完成';
                 
             } catch (error) {
                 showStatus('整图翻译失败: ' + error.message, 'error');
-            } finally {
                 translateBtn.disabled = false;
                 translateBtn.textContent = '上传文件并翻译';
             }
