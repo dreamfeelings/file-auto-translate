@@ -333,6 +333,31 @@
             width: 90%;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
             animation: zoomIn 0.3s;
+            position: relative;
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #999;
+            cursor: pointer;
+            line-height: 1;
+            transition: all 0.2s;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .modal-close-btn:hover {
+            color: #333;
+            background: #f0f0f0;
+            transform: rotate(90deg);
         }
 
         .translate-mode-content h3 {

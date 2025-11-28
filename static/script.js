@@ -342,10 +342,15 @@
             setTimeout(syncParagraphHeights, 50);
         }
 
+        // 关闭图片翻译模式选择弹窗
+        function closeTranslateModeModal() {
+            document.getElementById('translateModeModal').classList.remove('show');
+        }
+
         // 选择图片翻译模式
         function selectTranslateMode(mode) {
             imageTranslateMode = mode;
-            document.getElementById('translateModeModal').classList.remove('show');
+            closeTranslateModeModal();
             
             // 执行对应的翻译流程
             if (mode === 'segment') {
@@ -354,7 +359,17 @@
                 translateContentWithWholeImage();
             }
         }
-        
+
+        // ESC键关闭弹窗
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const modal = document.getElementById('translateModeModal');
+                if (modal.classList.contains('show')) {
+                    closeTranslateModeModal();
+                }
+            }
+        });
+
         // 分段识别翻译（先识别文字，再分段翻译）
         async function translateContentWithSegment() {
             const translateBtn = document.getElementById('translateBtn');

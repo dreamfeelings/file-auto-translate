@@ -143,8 +143,9 @@
     </div>
 
     <!-- 图片翻译模式选择模态框 -->
-    <div class="translate-mode-modal" id="translateModeModal">
+    <div class="translate-mode-modal" id="translateModeModal" onclick="closeTranslateModeModal()">
         <div class="translate-mode-content" onclick="event.stopPropagation()">
+            <span class="modal-close-btn" onclick="closeTranslateModeModal()">&times;</span>
             <h3>选择图片翻译模式</h3>
             <div class="mode-options">
                 <div class="mode-option" onclick="selectTranslateMode('segment')">
