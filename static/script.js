@@ -694,12 +694,6 @@
             statusDiv.className = 'status-message status-' + type;
             statusDiv.textContent = message;
             statusDiv.style.display = 'block';
-
-            if (type === 'success') {
-                setTimeout(() => {
-                    statusDiv.style.display = 'none';
-                }, 3000);
-            }
         }
 
         // HTML转义
