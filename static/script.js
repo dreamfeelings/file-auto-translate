@@ -342,6 +342,57 @@
             setTimeout(syncParagraphHeights, 50);
         }
 
+        // 显示带图片的原文内容（用于整图翻译）
+        function displayOriginalContentWithImages(content) {
+            const container = document.getElementById('originalContent');
+            container.innerHTML = '';
+
+            content.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'text-item';
+                div.setAttribute('data-paragraph', index + 1);
+                
+                // 如果有图片URL，显示图片
+                if (item.imageUrl) {
+                    div.innerHTML = `
+                        <div class="text-item-label">
+                            <span class="paragraph-number">${index + 1}</span>
+                            <span>原图${index + 1}</span>
+                        </div>
+                        <div class="text-content">
+                            <img src="${item.imageUrl}" alt="图片${index + 1}" style="max-width: 100%; border-radius: 8px; margin-top: 8px;">
+                        </div>
+                    `;
+                } else {
+                    div.innerHTML = `
+                        <div class="text-item-label">
+                            <span class="paragraph-number">${index + 1}</span>
+                            <span>原文段落</span>
+                        </div>
+                        <div class="text-content">${escapeHtml(item.text)}</div>
+                    `;
+                }
+                
+                // 添加鼠标悬停事件，同步高亮对应段落
+                div.addEventListener('mouseenter', function() {
+                    highlightParagraph(index + 1);
+                });
+                div.addEventListener('mouseleave', function() {
+                    clearHighlight();
+                });
+                
+                // 添加点击事件，同步滚动
+                div.addEventListener('click', function() {
+                    syncScrollToParagraph(index + 1);
+                });
+                
+                container.appendChild(div);
+            });
+            
+            // 延迟同步高度，确保DOM已渲染
+            setTimeout(syncParagraphHeights, 50);
+        }
+
         // 关闭图片翻译模式选择弹窗
         function closeTranslateModeModal() {
             document.getElementById('translateModeModal').classList.remove('show');
@@ -406,10 +457,15 @@
             
             try {
                 let allTranslations = [];
+                let imageUrls = [];  // 保存图片URL
                 
                 for (let i = 0; i < pendingFiles.length; i++) {
                     const file = pendingFiles[i];
                     showStatus(`正在翻译第 ${i + 1}/${pendingFiles.length} 张图片...`, 'info');
+                    
+                    // 创建图片预览URL
+                    const imageUrl = URL.createObjectURL(file);
+                    imageUrls.push(imageUrl);
                     
                     // 读取图片为base64
                     const base64Image = await readFileAsBase64(file);
@@ -432,29 +488,37 @@
                     if (data.success) {
                         allTranslations.push({
                             paragraph: i + 1,
-                            text: `[图片${i + 1}原文]`,
-                            translation: data.translation
+                            text: `[图片${i + 1}]`,
+                            translation: data.translation,
+                            imageUrl: imageUrl
                         });
                     } else {
                         allTranslations.push({
                             paragraph: i + 1,
-                            text: `[图片${i + 1}原文]`,
-                            translation: `[翻译失败: ${data.error}]`
+                            text: `[图片${i + 1}]`,
+                            translation: `[翻译失败: ${data.error}]`,
+                            imageUrl: imageUrl
                         });
                     }
                 }
                 
-                // 显示翻译结果
-                currentContent = allTranslations.map(t => ({ paragraph: t.paragraph, text: t.text }));
+                // 显示翻译结果（带图片）
+                const imageCount = allTranslations.length;
+                currentContent = allTranslations.map(t => ({ 
+                    paragraph: t.paragraph, 
+                    text: t.text,
+                    imageUrl: t.imageUrl 
+                }));
                 translatedContent = allTranslations;
-                currentFileName = `${pendingFiles.length}张图片`;
+                currentFileName = `${imageCount}张图片`;
                 
-                displayOriginalContent(currentContent);
+                displayOriginalContentWithImages(currentContent);
                 displayTranslatedContent(translatedContent);
                 
                 document.getElementById('exportActions').style.display = 'flex';
-                showStatus(`成功翻译 ${pendingFiles.length} 张图片！`, 'success');
+                showStatus(`成功翻译 ${imageUrls.length} 张图片！`, 'success');
                 
+                // 清空待处理文件，但不清除图片预览容器
                 pendingFiles = null;
                 
             } catch (error) {
